@@ -1,0 +1,83 @@
+import csv
+from datetime import datetime
+
+FILE = "expenses.csv"
+
+def init_file():
+    try:
+        with open(FILE, "x") as f:
+            writer = csv.writer(f)
+            writer.writerow(["Date", "Category", "Amount"])
+    except FileExistsError:
+        pass  # File already exists, no need to recreate
+
+
+
+def add_expense():
+    category = input("Enter category: ")
+    amount = float(input("Enter amount: "))
+    date = datetime.now().strftime("%Y-%m-%d")
+
+    with open(FILE, "a", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow([date, category, amount])
+
+    print("✅ Expense added successfully!")
+
+
+def view_expenses():
+    try:
+        with open(FILE, "r") as f:
+            reader = csv.reader(f)
+            print("\n--- All Expenses ---")
+            for row in reader:
+                print(row)
+    except FileNotFoundError:
+        print("No expense data found. Please add expenses first.")
+
+def monthly_report():
+    month = input("Enter month (YYYY-MM): ")
+    total = 0
+
+    try:
+        with open(FILE, "r") as f:
+            reader = csv.reader(f)
+            next(reader)  # skip header
+            for date, category, amount in reader:
+                if date.startswith(month):
+                    total += float(amount)
+
+        print(f"\n📊 Total expenses for {month}: ₹{total}")
+
+    except:
+        print("An error occurred while generating the report.")
+
+def main():
+    init_file()
+
+    while True:
+        print("\n=============================")
+        print(" PERSONAL FINANCE TRACKER ")
+        print("=============================")
+        print("1. Add Expense")
+        print("2. View All Expenses")
+        print("3. Monthly Report (YYYY-MM)")
+        print("4. Exit")
+        
+        choice = input("Enter choice: ")
+
+        if choice == "1":
+            add_expense()
+        elif choice == "2":
+            view_expenses()
+        elif choice == "3":
+            monthly_report()
+        elif choice == "4":
+            print("Exiting... Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+
+# Run the program
+main()
